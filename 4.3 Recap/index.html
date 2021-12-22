@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+    <body>
+        <div id ="root"></div>
+    </body>
+
+    <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+    
+    <script type="text/babel">
+        const root = document.querySelector("#root");
+
+        function Btn({btn_text, fontSize = 12}) { // Btn(props) -> props.btn_text, props["btn_text"] 처럼 사용해도 되고, 
+                                                  // Btn({btn_text}) -> btn_text로 사용해도 된다
+            console.log(props["btn_text"]); // 4-1 React Memo ver이 아니라면 setValue("Revert Changes") 시 Continue 버튼도 다시 render 된다.
+            return (
+                <button 
+                onClick={props["onClick"]}
+                style={{
+                    backgroundColor:"tomato",
+                    color:"white",
+                    padding:"10px 20px",
+                    border: 0,
+                    borderRadius:10,
+                    fontSize, // object 안에서 이런 식으로 쓸 수 있음 (fontSize: fontSize) 와 같다
+                }}>
+                    {btn_text}
+                </button>
+            );
+        }
+
+        Btn.propTypes = { // 4.2 Prop Types : Prop Types을 setting 해줄 수 있음
+            btn_text : PropTypes.string.isRequired, // btn_text는 string 이여야하고, 꼭 있어야 하는 prop
+            fontSize : PropTypes.number,
+        }; // memo ver 까지 검사해주지는 못한다
+
+        const MemorizedBtn = React.memo(Btn); // Btn 함수의 Memorized ver
+
+        
+
+        function App () {
+            const [value, setValue] = React.useState("Save changes");
+            const changeValue = () => setValue("Revert Changes")
+            return (
+                <div>
+                    <MemorizedBtn btn_text={value} onClick={changeValue}/>
+                    <MemorizedBtn btn_text="re-render 되지 않는 버튼" fontSize={"abc"}/>
+                    <Btn btn_text="re-render 되는 버튼" fontSize={"abc"}/>
+                </div>
+            );
+        }
+        
+        ReactDOM.render(<App />, root);
+    </script>
+
+    </html>
